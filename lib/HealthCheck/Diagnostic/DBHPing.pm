@@ -38,8 +38,12 @@ sub check {
 }
 
 sub run {
-    my ($self) = @_;
-    return { status => 'OK' };
+    my ( $self, %params ) = @_;
+    my $dbh = $params{dbh};
+
+    my $status = $dbh->ping ? "OK" : "CRITICAL";
+
+    return { status => $status };
 }
 
 1;

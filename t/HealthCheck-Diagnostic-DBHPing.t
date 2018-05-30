@@ -29,6 +29,11 @@ is_deeply( HealthCheck::Diagnostic::DBHPing->new( dbh => $fake_dbh )->check, {
     status => 'OK',
 }, "OK status as expected" );
 
+$My::Fake::DBI::success = 0;
+is_deeply( HealthCheck::Diagnostic::DBHPing->check( dbh => $fake_dbh ), {
+    status => 'CRITICAL',
+}, "CRITICAL status as expected" );
+
 done_testing;
 
 package My::Fake::DBI;
