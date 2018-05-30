@@ -20,4 +20,25 @@ eval { HealthCheck::Diagnostic::DBHPing->check( dbh => bless {} ) };
 is $@, sprintf( "Valid 'dbh' is required at %s line %d.\n",
     __FILE__, __LINE__ - 2 );
 
+
+my $fake_dbh = My::Fake::DBI->new;
+$My::Fake::DBI::success = "0 but true";
+
+is_deeply( HealthCheck::Diagnostic::DBHPing->new( dbh => $fake_dbh )->check, {
+    label  => 'dbh_ping',
+    status => 'OK',
+}, "OK status as expected" );
+
 done_testing;
+
+package My::Fake::DBI;
+
+our $success;
+sub new {
+    bless {
+        Name     => 'FakeDSN',
+        Username => 'FakeUsername',
+        Driver   => { Name => 'FakeDriver' }
+    }, $_[0];
+}
+sub ping { return $success }

@@ -31,7 +31,10 @@ sub check {
     croak("Valid 'dbh' is required") unless $dbh and do {
         local $@; local $SIG{__DIE__}; eval { $dbh->can('ping') } };
 
-    $self->SUPER::check( %params, dbh => $dbh );
+    my $res = $self->SUPER::check( %params, dbh => $dbh );
+    delete $res->{dbh};    # don't include the object in the result
+
+    return $res;
 }
 
 sub run {
