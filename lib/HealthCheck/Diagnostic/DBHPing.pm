@@ -8,6 +8,8 @@ use strict;
 use warnings;
 use parent 'HealthCheck::Diagnostic';
 
+use Carp;
+
 sub new {
     my ($class, @params) = @_;
 
@@ -19,6 +21,17 @@ sub new {
         label => 'dbh_ping',
         %params
     );
+}
+
+sub check {
+    my ( $self, %params ) = @_;
+
+    my $dbh = $params{dbh};
+    $dbh ||= $self->{dbh} if ref $self;
+    croak("Valid 'dbh' is required") unless $dbh and do {
+        local $@; local $SIG{__DIE__}; eval { $dbh->can('ping') } };
+
+    $self->SUPER::check( %params, dbh => $dbh );
 }
 
 sub run {
@@ -37,6 +50,19 @@ __END__
 
     my $result = $health_check->check;
 
+Or register an on-demand C<$dbh> with a callback.
+
+    $health_check->register( sub {
+        HealthCheck::Diagnostic::DBHPing->check( dbh => connect_to_db() );
+    } );
+
+Or the same thing with a pre-built diagnostic and a custom label:
+
+    my $diagnostic
+        = HealthCheck::Diagnostic::DBHPing->new( label => 'custom' );
+    $health_check->register(
+        sub { $diagnostic->check( dbh => connect_to_db() ) } );
+
 =head1 DESCRIPTION
 
 Calls C<< dbh->ping >> and checks the truthiness of the result to
@@ -47,6 +73,8 @@ determine if the database connection is available.
 =head2 dbh
 
 A L<DBI database handle object|DBI/DBI-DATABSE-HANDLE-OBJECTS>.
+
+Can be passed either to C<new> or C<check>.
 
 =head1 DEPENDENCIES
 
