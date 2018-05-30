@@ -44,7 +44,8 @@ sub run {
     my $status     = $dbh->ping      ? "OK"         : "CRITICAL";
     my $successful = $status eq "OK" ? "Successful" : "Unsuccessful";
 
-    my $info = "$successful ping of $dbh->{Name}";
+    my $driver = $dbh->{Driver}->{Name};
+    my $info   = "$successful $driver ping of $dbh->{Name}";
     $info .= " as $dbh->{Username}" if $dbh->{Username};
 
     return { status => $status, info => $info };

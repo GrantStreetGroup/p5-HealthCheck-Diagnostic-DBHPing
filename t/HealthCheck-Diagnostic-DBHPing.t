@@ -29,13 +29,13 @@ my $dbh = DBI->connect("dbi:SQLite:$dbname","","");
 is_deeply( HealthCheck::Diagnostic::DBHPing->new( dbh => $dbh )->check, {
     label  => 'dbh_ping',
     status => 'OK',
-    info   => "Successful ping of $dbname",
+    info   => "Successful SQLite ping of $dbname",
 }, "OK status as expected" );
 
 $dbh->disconnect;
 is_deeply( HealthCheck::Diagnostic::DBHPing->check( dbh => $dbh ), {
     status => 'CRITICAL',
-    info   => "Unsuccessful ping of dbname=:memory:",
+    info   => "Unsuccessful SQLite ping of dbname=:memory:",
 }, "CRITICAL status as expected" );
 
 # Now try it with a username
@@ -44,13 +44,13 @@ $dbh = DBI->connect("dbi:SQLite:$dbname","FakeUser","");
 is_deeply( HealthCheck::Diagnostic::DBHPing->new( dbh => $dbh )->check, {
     label  => 'dbh_ping',
     status => 'OK',
-    info   => "Successful ping of $dbname as FakeUser",
+    info   => "Successful SQLite ping of $dbname as FakeUser",
 }, "OK status as expected" );
 
 $dbh->disconnect;
 is_deeply( HealthCheck::Diagnostic::DBHPing->check( dbh => $dbh ), {
     status => 'CRITICAL',
-    info   => "Unsuccessful ping of $dbname as FakeUser",
+    info   => "Unsuccessful SQLite ping of $dbname as FakeUser",
 }, "CRITICAL status as expected" );
 
 done_testing;
