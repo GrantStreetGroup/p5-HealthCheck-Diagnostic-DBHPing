@@ -1,6 +1,6 @@
 package HealthCheck::Diagnostic::DBHPing;
 
-# ABSTRACT: Ping your database to check its health.
+# ABSTRACT: Ping a database handle to check its health
 # VERSION
 
 use 5.010;
@@ -40,7 +40,7 @@ __END__
 =head1 DESCRIPTION
 
 Calls C<< dbh->ping >> and checks the truthiness of the result to
-determine if the database connection is valid and available.
+determine if the database connection is available.
 
 =head1 ATTRIBUTES
 
