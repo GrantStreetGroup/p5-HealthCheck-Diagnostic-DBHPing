@@ -6,20 +6,22 @@ use HealthCheck::Diagnostic::DBHPing;
 use DBI;
 use DBD::SQLite;
 
+my $nl = $] >= 5.016 ? ".\n" : "\n";
+
 eval { HealthCheck::Diagnostic::DBHPing->check };
-is $@, sprintf( "Valid 'dbh' is required at %s line %d.\n",
+is $@, sprintf( "Valid 'dbh' is required at %s line %d$nl",
     __FILE__, __LINE__ - 2 );
 
 eval { HealthCheck::Diagnostic::DBHPing->new->check };
-is $@, sprintf( "Valid 'dbh' is required at %s line %d.\n",
+is $@, sprintf( "Valid 'dbh' is required at %s line %d$nl",
     __FILE__, __LINE__ - 2 );
 
 eval { HealthCheck::Diagnostic::DBHPing->new( dbh => {} )->check };
-is $@, sprintf( "Valid 'dbh' is required at %s line %d.\n",
+is $@, sprintf( "Valid 'dbh' is required at %s line %d$nl",
     __FILE__, __LINE__ - 2 );
 
 eval { HealthCheck::Diagnostic::DBHPing->check( dbh => bless {} ) };
-is $@, sprintf( "Valid 'dbh' is required at %s line %d.\n",
+is $@, sprintf( "Valid 'dbh' is required at %s line %d$nl",
     __FILE__, __LINE__ - 2 );
 
 
