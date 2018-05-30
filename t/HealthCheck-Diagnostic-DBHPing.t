@@ -27,11 +27,13 @@ $My::Fake::DBI::success = "0 but true";
 is_deeply( HealthCheck::Diagnostic::DBHPing->new( dbh => $fake_dbh )->check, {
     label  => 'dbh_ping',
     status => 'OK',
+    info   => "Successful ping of FakeDSN as FakeUsername",
 }, "OK status as expected" );
 
 $My::Fake::DBI::success = 0;
 is_deeply( HealthCheck::Diagnostic::DBHPing->check( dbh => $fake_dbh ), {
     status => 'CRITICAL',
+    info   => "Unsuccessful ping of FakeDSN as FakeUsername",
 }, "CRITICAL status as expected" );
 
 done_testing;

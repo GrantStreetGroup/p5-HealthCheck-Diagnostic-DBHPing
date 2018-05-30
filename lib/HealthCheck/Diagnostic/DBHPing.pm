@@ -41,9 +41,11 @@ sub run {
     my ( $self, %params ) = @_;
     my $dbh = $params{dbh};
 
-    my $status = $dbh->ping ? "OK" : "CRITICAL";
+    my $status     = $dbh->ping      ? "OK"         : "CRITICAL";
+    my $successful = $status eq "OK" ? "Successful" : "Unsuccessful";
+    my $info = "$successful ping of $dbh->{Name} as $dbh->{Username}";
 
-    return { status => $status };
+    return { status => $status, info => $info };
 }
 
 1;
