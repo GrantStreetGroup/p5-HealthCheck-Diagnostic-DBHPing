@@ -61,6 +61,7 @@ __END__
     ] );
 
     my $result = $health_check->check;
+    $result->{status}; # Returns either OK on a successful ping
 
 Or register an on-demand C<$dbh> with a callback.
 
@@ -68,7 +69,7 @@ Or register an on-demand C<$dbh> with a callback.
         HealthCheck::Diagnostic::DBHPing->check( dbh => connect_to_db() );
     } );
 
-Or the same thing with a pre-built diagnostic and a custom label:
+Or perform the same action with a pre-built diagnostic and a custom label:
 
     my $diagnostic
         = HealthCheck::Diagnostic::DBHPing->new( label => 'custom' );
@@ -77,8 +78,8 @@ Or the same thing with a pre-built diagnostic and a custom label:
 
 =head1 DESCRIPTION
 
-Calls C<< dbh->ping >> and checks the truthiness of the result to
-determine if the database connection is available.
+Determines if the database connection is available. This is achieved by
+It does so by returning the true/false C<< dbh->ping >> value.
 
 =head1 ATTRIBUTES
 
