@@ -78,8 +78,9 @@ Or perform the same action with a pre-built diagnostic and a custom label:
 
 =head1 DESCRIPTION
 
-Determines if the database connection is available. This is achieved by
-It does so by returning the true/false C<< dbh->ping >> value.
+Determines if the database connection is available.
+Sets the C<status> to "OK" or "CRITICAL" based on the
+return value from C<< dbh->ping >>.
 
 =head1 ATTRIBUTES
 
