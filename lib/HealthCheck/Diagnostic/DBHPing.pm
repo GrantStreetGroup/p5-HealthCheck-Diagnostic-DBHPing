@@ -28,6 +28,8 @@ sub check {
 
     my $dbh = $params{dbh};
     $dbh ||= $self->{dbh} if ref $self;
+    # Maybe someday allow a "builder" callback?
+    # $dbh = $dbh->(%params) if ref $dbh eq 'CODE';
     croak("Valid 'dbh' is required") unless $dbh and do {
         local $@; local $SIG{__DIE__}; eval { $dbh->can('ping') } };
 
