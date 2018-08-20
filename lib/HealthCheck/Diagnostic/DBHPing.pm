@@ -1,12 +1,14 @@
 package HealthCheck::Diagnostic::DBHPing;
 
-# ABSTRACT: Ping your database to check its health.
+# ABSTRACT: Ping a database handle to check its health
 # VERSION
 
 use 5.010;
 use strict;
 use warnings;
 use parent 'HealthCheck::Diagnostic';
+
+use Carp;
 
 sub new {
     my ($class, @params) = @_;
@@ -21,9 +23,34 @@ sub new {
     );
 }
 
+sub check {
+    my ( $self, %params ) = @_;
+
+    my $dbh = $params{dbh};
+    $dbh ||= $self->{dbh} if ref $self;
+    # Maybe someday allow a "builder" callback?
+    # $dbh = $dbh->(%params) if ref $dbh eq 'CODE';
+    croak("Valid 'dbh' is required") unless $dbh and do {
+        local $@; local $SIG{__DIE__}; eval { $dbh->can('ping') } };
+
+    my $res = $self->SUPER::check( %params, dbh => $dbh );
+    delete $res->{dbh};    # don't include the object in the result
+
+    return $res;
+}
+
 sub run {
-    my ($self) = @_;
-    return { status => 'OK' };
+    my ( $self, %params ) = @_;
+    my $dbh = $params{dbh};
+
+    my $status     = $dbh->ping      ? "OK"         : "CRITICAL";
+    my $successful = $status eq "OK" ? "Successful" : "Unsuccessful";
+
+    my $driver = $dbh->{Driver}->{Name};
+    my $info   = "$successful $driver ping of $dbh->{Name}";
+    $info .= " as $dbh->{Username}" if $dbh->{Username};
+
+    return { status => $status, info => $info };
 }
 
 1;
@@ -36,17 +63,34 @@ __END__
     ] );
 
     my $result = $health_check->check;
+    $result->{status}; # Returns either OK on a successful ping
+
+Or register an on-demand C<$dbh> with a callback.
+
+    $health_check->register( sub {
+        HealthCheck::Diagnostic::DBHPing->check( dbh => connect_to_db() );
+    } );
+
+Or perform the same action with a pre-built diagnostic and a custom label:
+
+    my $diagnostic
+        = HealthCheck::Diagnostic::DBHPing->new( label => 'custom' );
+    $health_check->register(
+        sub { $diagnostic->check( dbh => connect_to_db() ) } );
 
 =head1 DESCRIPTION
 
-Calls C<< dbh->ping >> and checks the truthiness of the result to
-determine if the database connection is valid and available.
+Determines if the database connection is available.
+Sets the C<status> to "OK" or "CRITICAL" based on the
+return value from C<< dbh->ping >>.
 
 =head1 ATTRIBUTES
 
 =head2 dbh
 
 A L<DBI database handle object|DBI/DBI-DATABSE-HANDLE-OBJECTS>.
+
+Can be passed either to C<new> or C<check>.
 
 =head1 DEPENDENCIES
 
