@@ -24,6 +24,10 @@ eval { HealthCheck::Diagnostic::DBHPing->check( dbh => bless {} ) };
 is $@, sprintf( "Valid 'dbh' is required at %s line %d$nl",
     __FILE__, __LINE__ - 2 );
 
+eval { HealthCheck::Diagnostic::DBHPing->check( dbh => sub {} ) };
+is $@, sprintf( "Valid 'dbh' is required at %s line %d$nl",
+    __FILE__, __LINE__ - 2 );
+
 
 my $dbname = 'dbname=:memory:';
 my $dbh = DBI->connect("dbi:SQLite:$dbname","","");
@@ -40,8 +44,8 @@ is_deeply( HealthCheck::Diagnostic::DBHPing->check( dbh => $dbh ), {
     info   => "Unsuccessful SQLite ping of dbname=:memory:",
 }, "CRITICAL status as expected" );
 
-# Now try it with a username
-$dbh = DBI->connect("dbi:SQLite:$dbname","FakeUser","");
+# Now try it with a username and a coderef
+$dbh = sub { DBI->connect("dbi:SQLite:$dbname","FakeUser","") };
 
 is_deeply( HealthCheck::Diagnostic::DBHPing->new( dbh => $dbh )->check, {
     label  => 'dbh_ping',
@@ -49,7 +53,9 @@ is_deeply( HealthCheck::Diagnostic::DBHPing->new( dbh => $dbh )->check, {
     info   => "Successful SQLite ping of $dbname as FakeUser",
 }, "OK status as expected" );
 
-$dbh->disconnect;
+# Turn it into a coderef that returns a disconnected dbh
+$dbh = do { my $x = $dbh; sub { my $y = $x->(); $y->disconnect; $y } };
+
 is_deeply( HealthCheck::Diagnostic::DBHPing->check( dbh => $dbh ), {
     status => 'CRITICAL',
     info   => "Unsuccessful SQLite ping of $dbname as FakeUser",

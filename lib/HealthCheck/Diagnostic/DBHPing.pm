@@ -28,8 +28,8 @@ sub check {
 
     my $dbh = $params{dbh};
     $dbh ||= $self->{dbh} if ref $self;
-    # Maybe someday allow a "builder" callback?
-    # $dbh = $dbh->(%params) if ref $dbh eq 'CODE';
+    $dbh = $dbh->(%params) if ref $dbh eq 'CODE';
+
     croak("Valid 'dbh' is required") unless $dbh and do {
         local $@; local $SIG{__DIE__}; eval { $dbh->can('ping') } };
 
@@ -59,24 +59,11 @@ __END__
 =head1 SYNOPSIS
 
     my $health_check = HealthCheck->new( checks => [
-        HealthCheck::Diagnostic::DBHPing->new( dbh => $dbh )
+        HealthCheck::Diagnostic::DBHPing->new( dbh => \&connect_to_db )
     ] );
 
     my $result = $health_check->check;
-    $result->{status}; # Returns either OK on a successful ping
-
-Or register an on-demand C<$dbh> with a callback.
-
-    $health_check->register( sub {
-        HealthCheck::Diagnostic::DBHPing->check( dbh => connect_to_db() );
-    } );
-
-Or perform the same action with a pre-built diagnostic and a custom label:
-
-    my $diagnostic
-        = HealthCheck::Diagnostic::DBHPing->new( label => 'custom' );
-    $health_check->register(
-        sub { $diagnostic->check( dbh => connect_to_db() ) } );
+    $result->{status}; # OK on a successful ping or CRITICAL otherwise
 
 =head1 DESCRIPTION
 
@@ -88,7 +75,9 @@ return value from C<< dbh->ping >>.
 
 =head2 dbh
 
-A L<DBI database handle object|DBI/DBI-DATABSE-HANDLE-OBJECTS>.
+A coderef that returns a
+L<DBI database handle object|DBI/DBI-DATABSE-HANDLE-OBJECTS>
+or optionally the handle itself.
 
 Can be passed either to C<new> or C<check>.
 
