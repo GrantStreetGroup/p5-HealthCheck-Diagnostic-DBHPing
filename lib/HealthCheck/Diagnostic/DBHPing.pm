@@ -73,6 +73,8 @@ return value from C<< dbh->ping >>.
 
 =head1 ATTRIBUTES
 
+Those inherited from L<HealthCheck::Diagnostic/ATTRIBUTES> plus:
+
 =head2 dbh
 
 A coderef that returns a
