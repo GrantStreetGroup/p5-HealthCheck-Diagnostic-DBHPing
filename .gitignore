@@ -19,3 +19,4 @@ cpanfile.snapshot
 local/
 HealthCheck-Diagnostic-DBHPing-v*/
 HealthCheck-Diagnostic-DBHPing-v*.tar.*
+*.bak
