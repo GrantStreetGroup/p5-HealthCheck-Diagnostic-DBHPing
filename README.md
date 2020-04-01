@@ -4,7 +4,7 @@ HealthCheck::Diagnostic::DBHPing - Ping a database handle to check its health
 
 # VERSION
 
-version v1.2.3
+version v1.2.4
 
 # SYNOPSIS
 
