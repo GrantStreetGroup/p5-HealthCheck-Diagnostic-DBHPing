@@ -4,7 +4,7 @@ HealthCheck::Diagnostic::DBHPing - Ping a database handle to check its health
 
 # VERSION
 
-version v1.2.4
+version v1.2.5
 
 # SYNOPSIS
 
@@ -47,7 +47,7 @@ Grant Street Group <developers@grantstreet.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 - 2020 by Grant Street Group.
+This software is Copyright (c) 2018 - 2023 by Grant Street Group.
 
 This is free software, licensed under:
 
